@@ -5,15 +5,15 @@
 ```shell
 $ curl "http://ip.taobao.com/service/getIpInfo.php?ip=123.56.47.221"
 {
-	"code": 0,
-	"data": {
-		"country": "中国",
-		"area": "华北",
-		"region": "北京市",
-		"city": "北京市",
-		"isp": "阿里云",
-		"ip": "123.56.47.221"
-	}
+    "code": 0,
+    "data": {
+        "country": "中国",
+        "area": "华北",
+        "region": "北京市",
+        "city": "北京市",
+        "isp": "阿里云",
+        "ip": "123.56.47.221"
+    }
 }
 ```
 
