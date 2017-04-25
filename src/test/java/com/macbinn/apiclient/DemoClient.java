@@ -13,4 +13,7 @@ public interface DemoClient {
 
     @Http(url = "http://demo.com/api/addUser", method = HttpMethod.POST, encoder = Encoders.Json)
     boolean addUser(User user);
+
+    @Http(url = "http://demo.com/api/user/{name}/")
+    User queryUser(@PathVar("name") String name);
 }

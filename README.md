@@ -99,5 +99,24 @@ public interface DemoClient {
 }
 ```
 
+#### 3、REST API
 
+REST API中有些变量是在path上的，例如：
+
+```shell
+$ curl "http://demo.com/user/macbinn/"
+{
+  "name": "macbinn",
+  "age": 20
+}
+```
+
+Client定义如下：
+
+```java
+public interface DemoClient {
+    @Http(url = "http://demo.com/user/{name}/")
+    User queryUser(@PathVar("name") String name);
+}
+```
 

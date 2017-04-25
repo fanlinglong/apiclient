@@ -26,6 +26,7 @@ public class Example {
         user.setName("macbinn");
         user.setAge(20);
         logger.info("addUser: {}", client.addUser(user));
+        logger.info("queryUser: {}", client.queryUser(user.getName()));
         logger.info("addData: {}", client.addData("hello world"));
     }
 

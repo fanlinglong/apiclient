@@ -41,15 +41,23 @@ public class ApiClientInvocationHandler extends AbstractLogger implements Invoca
         String url = httpAnnotation.url();
 
         Map<String, Object> params = new HashMap<>();
+        Map<String, String> pathVars = new HashMap<>();
         int i = 0;
         for (Annotation[] annotations : method.getParameterAnnotations()) {
             for (Annotation annotation : annotations) {
                 if (annotation.annotationType() == Param.class) {
                     Param paramAnnotation = (Param) annotation;
                     params.put(paramAnnotation.value(), String.valueOf(objects[i]));
+                } else if (annotation.annotationType() == PathVar.class) {
+                    PathVar pathVar = (PathVar) annotation;
+                    pathVars.put(pathVar.value(), String.valueOf(objects[i]));
                 }
             }
             i++;
+        }
+
+        for (Map.Entry<String, String> entry : pathVars.entrySet()) {
+            url = url.replaceAll("\\{" + entry.getKey() + "\\}", entry.getValue());
         }
 
         Encoder encoder = getEncoder(httpAnnotation.encoder());
@@ -62,7 +70,9 @@ public class ApiClientInvocationHandler extends AbstractLogger implements Invoca
 
         String responseBody = null;
         if (httpAnnotation.method() == HttpMethod.GET) {
-            url = url + "?" + query;
+            if (null != query) {
+                url = url + "?" + query;
+            }
             responseBody = httpClient.get(url);
             logger.debug("url={}", url);
         } else if (httpAnnotation.method() == HttpMethod.POST) {
