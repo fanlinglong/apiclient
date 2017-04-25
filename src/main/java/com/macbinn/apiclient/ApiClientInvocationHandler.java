@@ -7,11 +7,10 @@ import com.macbinn.apiclient.encoder.KeyValuePairsEncoder;
 import com.macbinn.apiclient.http.Http;
 import com.macbinn.apiclient.http.HttpClient;
 import com.macbinn.apiclient.http.HttpMethod;
-import com.macbinn.apiclient.http.SimpleHttpClient;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,7 +26,11 @@ public class ApiClientInvocationHandler extends AbstractLogger implements Invoca
         encoderMap.put(Encoders.KeyValuePairs, new KeyValuePairsEncoder());
     }
 
-    private HttpClient httpClient = new SimpleHttpClient();
+    private HttpClient httpClient;
+
+    public ApiClientInvocationHandler(HttpClient httpClient) {
+        this.httpClient = httpClient;
+    }
 
     private Encoder getEncoder(Encoders encoders) {
         return encoderMap.get(encoders);
@@ -39,13 +42,23 @@ public class ApiClientInvocationHandler extends AbstractLogger implements Invoca
 
         Map<String, Object> params = new HashMap<>();
         int i = 0;
-        for (Parameter parameter : method.getParameters()) {
-            Param paramAnnotation = parameter.getAnnotation(Param.class);
-            logger.debug("parameter={}, paramAnnotation={}", parameter, paramAnnotation);
-            params.put(paramAnnotation.value(), String.valueOf(objects[i++]));
+        for (Annotation[] annotations : method.getParameterAnnotations()) {
+            for (Annotation annotation : annotations) {
+                if (annotation.annotationType() == Param.class) {
+                    Param paramAnnotation = (Param) annotation;
+                    params.put(paramAnnotation.value(), String.valueOf(objects[i]));
+                }
+            }
+            i++;
         }
 
-        String query = getEncoder(httpAnnotation.encoder()).encode(params);
+        Encoder encoder = getEncoder(httpAnnotation.encoder());
+        String query = null;
+        if (params.size() == 0) {
+            query = encoder.encode(objects[0]);
+        } else {
+            query = encoder.encode(params);
+        }
 
         String responseBody = null;
         if (httpAnnotation.method() == HttpMethod.GET) {

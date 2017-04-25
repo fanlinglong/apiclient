@@ -12,13 +12,18 @@ import java.util.Map;
  */
 public class JsonEncoder extends AbstractLogger implements Encoder {
     @Override
-    public String encode(Map<String, Object> params) {
+    public String encode(Object o) {
         try {
-            return JSONUtil.OBJECT_MAPPER.writeValueAsString(params);
+            return JSONUtil.OBJECT_MAPPER.writeValueAsString(o);
         } catch (JsonProcessingException e) {
             logger.error("json encode error", e);
         }
         return null;
+    }
+
+    @Override
+    public String encode(Map<String, Object> params) {
+        return encode((Object) params);
     }
 
     @Override
